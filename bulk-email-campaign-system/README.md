@@ -28,8 +28,7 @@ An enterprise-grade Spring Boot application for creating, scheduling, and tracki
 └───────────────────────────────┬──────────────────────────┘
                                 │
                     ┌───────────▼────────────┐
-                    │    SQLite Database      │
-                    │  (./data/campaign.db)   │
+                    │    MYSQL Database      │
                     └────────────────────────┘
 ```
 
