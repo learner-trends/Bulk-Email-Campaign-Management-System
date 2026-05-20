@@ -1,0 +1,36 @@
+name: Spring Boot CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  backend-frontend-ci:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build Backend
+        run: |
+          cd bulk-email-campaign-system
+          mvn clean install
+
+      - name: Build Backend Docker Image
+        run: docker build -t bulk-email-app ./bulk-email-campaign-system
+
+      - name: Build Frontend Docker Image
+        run: docker build -t email-campaign-ui ./email-campaign
+
+      - name: Verify Docker Compose
+        run: docker compose config
