@@ -1,0 +1,31 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { Toaster } from 'react-hot-toast'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+    <Toaster
+      position="top-right"
+      toastOptions={{
+        duration: 3500,
+        style: {
+          background: '#1e293b',
+          color: '#f1f5f9',
+          border: '1px solid #334155',
+          borderRadius: '10px',
+          fontSize: '14px',
+          fontFamily: "'DM Sans', sans-serif",
+        },
+        success: {
+          iconTheme: { primary: '#22d3ee', secondary: '#1e293b' },
+        },
+        error: {
+          iconTheme: { primary: '#f87171', secondary: '#1e293b' },
+        },
+      }}
+    />
+  </React.StrictMode>
+)

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Campaign Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6f9; color: #333; }
+        nav { background: #1a1a2e; color: white; padding: 0 24px; display: flex; align-items: center; height: 56px; gap: 8px; }
+        nav h1 { font-size: 18px; font-weight: 700; color: #7eb8f7; margin-right: 32px; }
+        nav a { color: rgba(255,255,255,0.75); text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; transition: all 0.2s; }
+        nav a:hover, nav a.active { background: rgba(255,255,255,0.12); color: white; }
+        .container { max-width: 1200px; margin: 32px auto; padding: 0 24px; }
+        .page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .page-header h2 { font-size: 22px; font-weight: 600; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 20px; }
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+        .btn-primary { background: #2563eb; color: white; } .btn-primary:hover { background: #1d4ed8; }
+        .btn-sm { padding: 5px 12px; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafbfc; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-DRAFT { background: #e2e8f0; color: #64748b; }
+        .badge-SCHEDULED { background: #dbeafe; color: #1d4ed8; }
+        .badge-IN_PROGRESS { background: #fef3c7; color: #d97706; }
+        .badge-COMPLETED { background: #dcfce7; color: #16a34a; }
+        .badge-FAILED { background: #fee2e2; color: #dc2626; }
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+        .alert-success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid #2563eb; }
+        .stat-card.green { border-left-color: #16a34a; }
+        .stat-card.orange { border-left-color: #d97706; }
+        .stat-card.purple { border-left-color: #7c3aed; }
+        .stat-card .label { font-size: 13px; color: #6b7280; margin-bottom: 8px; font-weight: 500; }
+        .stat-card .value { font-size: 32px; font-weight: 700; color: #1a1a2e; }
+        .empty-state { text-align: center; padding: 48px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+<nav>
+    <h1>📧 Campaign Manager</h1>
+    <a href="/" class="active">Dashboard</a>
+    <a href="/campaigns">Campaigns</a>
+    <a href="/recipients">Recipients</a>
+</nav>
+
+<div class="container">
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+    <div class="page-header">
+        <h2>📊 Dashboard</h2>
+        <a href="/campaigns/new" class="btn btn-primary">+ New Campaign</a>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="label">Total Campaigns</div>
+            <div class="value" th:text="${totalCampaigns}">0</div>
+        </div>
+        <div class="stat-card green">
+            <div class="label">Total Recipients</div>
+            <div class="value" th:text="${totalRecipients}">0</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="label">Subscribed</div>
+            <div class="value" th:text="${subscribedCount}">0</div>
+        </div>
+        <div class="stat-card purple">
+            <div class="label">Unsubscribed</div>
+            <div class="value" th:text="${totalRecipients - subscribedCount}">0</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="font-size:16px;font-weight:600;">Recent Campaigns</h3>
+            <a href="/campaigns" class="btn btn-sm btn-primary">View All</a>
+        </div>
+        <div th:if="${#lists.isEmpty(campaigns)}" class="empty-state">
+            <p>No campaigns yet.</p>
+            <a href="/campaigns/new" class="btn btn-primary">Create your first campaign</a>
+        </div>
+        <table th:unless="${#lists.isEmpty(campaigns)}">
+            <thead>
+            <tr>
+                <th>Campaign Name</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Scheduled</th>
+                <th>Sent</th>
+                <th>Failed</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${campaigns}">
+                <td th:text="${c.campaignName}"></td>
+                <td th:text="${c.subjectLine}"></td>
+                <td>
+                    <span class="badge" th:classappend="'badge-' + ${c.status}" th:text="${c.status}"></span>
+                </td>
+                <td th:text="${#temporals.format(c.scheduledTime, 'dd MMM yyyy HH:mm')}"></td>
+                <td th:text="${c.sentCount}">0</td>
+                <td th:text="${c.failedCount}">0</td>
+                <td><a th:href="@{/campaigns/{id}(id=${c.id})}" class="btn btn-sm btn-primary">View</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

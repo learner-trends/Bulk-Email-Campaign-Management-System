@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Campaign Form — Campaign Manager</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6f9; color: #333; }
+        nav { background: #1a1a2e; color: white; padding: 0 24px; display: flex; align-items: center; height: 56px; gap: 8px; }
+        nav h1 { font-size: 18px; font-weight: 700; color: #7eb8f7; margin-right: 32px; }
+        nav a { color: rgba(255,255,255,0.75); text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; transition: all 0.2s; }
+        nav a:hover { background: rgba(255,255,255,0.12); color: white; }
+        .container { max-width: 780px; margin: 32px auto; padding: 0 24px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 32px; }
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+        .btn-primary { background: #2563eb; color: white; } .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #e2e8f0; color: #475569; } .btn-secondary:hover { background: #cbd5e1; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #374151; }
+        input[type="text"], input[type="datetime-local"], textarea { width: 100%; padding: 9px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: border-color 0.2s; font-family: inherit; }
+        input:focus, textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        textarea { resize: vertical; min-height: 200px; }
+        .hint { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+        .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .page-header { margin-bottom: 24px; }
+        .page-header h2 { font-size: 22px; font-weight: 600; }
+        .breadcrumb { font-size: 13px; color: #9ca3af; margin-bottom: 6px; }
+        .breadcrumb a { color: #6b7280; text-decoration: none; } .breadcrumb a:hover { color: #2563eb; }
+    </style>
+</head>
+<body>
+<nav>
+    <h1>📧 Campaign Manager</h1>
+    <a href="/">Dashboard</a>
+    <a href="/campaigns" class="active">Campaigns</a>
+    <a href="/recipients">Recipients</a>
+</nav>
+
+<div class="container">
+    <div class="page-header">
+        <div class="breadcrumb"><a href="/campaigns">Campaigns</a> / <span th:text="${campaignId != null ? 'Edit' : 'New'}">New</span></div>
+        <h2 th:text="${campaignId != null ? 'Edit Campaign' : 'Create Campaign'}">Create Campaign</h2>
+    </div>
+
+    <div class="card">
+        <form th:action="${campaignId != null ? '/campaigns/' + campaignId + '/update' : '/campaigns'}"
+              th:object="${campaignRequest}" method="post">
+
+            <div class="form-group">
+                <label for="campaignName">Campaign Name *</label>
+                <input type="text" id="campaignName" th:field="*{campaignName}" placeholder="e.g. Summer Sale 2025" />
+                <p th:if="${#fields.hasErrors('campaignName')}" th:errors="*{campaignName}" style="color:#dc2626;font-size:12px;margin-top:4px;"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="subjectLine">Subject Line *</label>
+                <input type="text" id="subjectLine" th:field="*{subjectLine}" placeholder="e.g. 🎉 Exclusive offer just for you!" />
+                <p th:if="${#fields.hasErrors('subjectLine')}" th:errors="*{subjectLine}" style="color:#dc2626;font-size:12px;margin-top:4px;"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="scheduledTime">Scheduled Time *</label>
+                <input type="datetime-local" id="scheduledTime" th:field="*{scheduledTime}" />
+                <p class="hint">The campaign will be sent automatically at this time (checked every 60 seconds).</p>
+                <p th:if="${#fields.hasErrors('scheduledTime')}" th:errors="*{scheduledTime}" style="color:#dc2626;font-size:12px;margin-top:4px;"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="emailContent">Email Content (HTML) *</label>
+                <textarea id="emailContent" th:field="*{emailContent}" placeholder="Write your email content here. Use {{name}} to personalise with recipient's name."></textarea>
+                <p class="hint">HTML is supported. Use <code>{{name}}</code> as a personalisation token for the recipient's name.</p>
+                <p th:if="${#fields.hasErrors('emailContent')}" th:errors="*{emailContent}" style="color:#dc2626;font-size:12px;margin-top:4px;"></p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <span th:text="${campaignId != null ? '💾 Save Changes' : '✅ Create Campaign'}">Create Campaign</span>
+                </button>
+                <a href="/campaigns" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
